@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscador de Usuarios de GitHub</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>🔎 Buscador de GitHub</h1>
+    <p class="subtitle">Busca cualquier usuario y consulta su perfil y repositorios públicos</p>
+  </header>
+
+  <main class="container">
+
+    <!-- Formulario de búsqueda -->
+    <section class="search-section">
+      <form id="form-buscar" novalidate>
+        <label for="usuario" class="visually-hidden">Nombre de usuario de GitHub</label>
+        <input
+          type="text"
+          id="usuario"
+          name="usuario"
+          placeholder="Ejemplo: torvalds"
+          autocomplete="off"
+          maxlength="39"
+        />
+        <button type="submit" id="btn-buscar">Buscar usuario</button>
+      </form>
+      <p id="alerta-validacion" class="alerta error" role="alert" aria-live="polite"></p>
+    </section>
+
+    <!-- Indicador de carga -->
+    <div id="cargando" class="cargando" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <span>Buscando información en GitHub...</span>
+    </div>
+
+    <!-- Mensaje de error de la API -->
+    <div id="mensaje-error" class="mensaje error oculto" role="alert" aria-live="assertive"></div>
+
+    <!-- Tarjeta de perfil (se inyecta desde JavaScript) -->
+    <section id="perfil" class="perfil-seccion oculto">
+      <article class="tarjeta-perfil" aria-label="Perfil de GitHub">
+
+        <!-- Columna lateral izquierda: avatar + estadísticas -->
+        <div class="tarjeta-lateral">
+          <div class="avatar-container">
+            <img id="img-avatar" class="avatar" alt="" />
+          </div>
+
+          <div class="estadisticas-lateral">
+            <div class="stat-lateral">
+              <span class="valor" id="stat-repos">0</span>
+              <span class="etiqueta">Repos públicos</span>
+            </div>
+            <div class="stat-lateral">
+              <span class="valor" id="stat-seguidores">0</span>
+              <span class="etiqueta">Seguidores</span>
+            </div>
+            <div class="stat-lateral">
+              <span class="valor" id="stat-siguiendo">0</span>
+              <span class="etiqueta">Siguiendo</span>
+            </div>
+            <div class="stat-lateral">
+              <span class="valor" id="stat-gists">0</span>
+              <span class="etiqueta">Gists públicos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: nombre, biografía, enlace y repositorios -->
+        <div class="tarjeta-contenido">
+          <div class="datos-principales">
+            <h2 id="nombre-usuario" class="nombre"></h2>
+            <p id="bio" class="bio"></p>
+            <a id="enlace-perfil" class="enlace-perfil" target="_blank" rel="noopener noreferrer">
+              Ver perfil en GitHub →
+            </a>
+          </div>
+
+          <!-- Repositorios -->
+          <div class="repos-seccion">
+            <h3 class="titulo-repos">Repositorios públicos</h3>
+            <ul id="lista-repos" class="lista-repos"></ul>
+          </div>
+        </div>
+
+      </article>
+    </section>
+
+    <!-- README del perfil (se inyecta desde JavaScript, solo si existe) -->
+    <section id="readme-seccion" class="readme-seccion oculto" aria-label="README del perfil">
+      <h3 class="titulo-readme">README del perfil</h3>
+      <div id="readme-contenido" class="markdown-body"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Aplicación educativa que consume la API pública de GitHub. Sin tokens ni datos inventados.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
