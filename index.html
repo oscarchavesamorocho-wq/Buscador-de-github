@@ -3,104 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador de Usuarios de GitHub</title>
+  <meta name="theme-color" content="#b3e5fc" />
+  <title>Buscador de Perfiles de GitHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- Decoración geométrica de fondo (estética retro 90s) -->
+  <div class="deco deco-1"></div>
+  <div class="deco deco-2"></div>
+  <div class="deco deco-3"></div>
+  <div class="deco deco-4"></div>
+  <div class="deco deco-5"></div>
+  <div class="deco deco-6"></div>
+  <div class="deco deco-7"></div>
+  <div class="deco deco-8"></div>
+
+  <!-- Cabecera -->
   <header class="site-header">
-    <h1>🔎 Buscador de GitHub</h1>
-    <p class="subtitle">Busca cualquier usuario y consulta su perfil y repositorios públicos</p>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-mark">90'S</div>
+        <span class="logo-text">Buscador <span class="logo-acento">GitHub</span></span>
+      </div>
+      <nav class="nav">
+        <a href="#" class="nav-link">Inicio</a>
+        <a href="#" class="nav-link">Acerca de</a>
+        <a href="#" class="nav-link">Contacto</a>
+      </nav>
+      <div class="header-actions">
+        <button id="btn-tema" class="btn-icono" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+      </div>
+    </div>
   </header>
 
   <main class="container">
 
-    <!-- Formulario de búsqueda -->
-    <section class="search-section">
-      <form id="form-buscar" novalidate>
-        <label for="usuario" class="visually-hidden">Nombre de usuario de GitHub</label>
-        <input
-          type="text"
-          id="usuario"
-          name="usuario"
-          placeholder="Ejemplo: torvalds"
-          autocomplete="off"
-          maxlength="39"
-        />
-        <button type="submit" id="btn-buscar">Buscar usuario</button>
-      </form>
-      <p id="alerta-validacion" class="alerta error" role="alert" aria-live="polite"></p>
+    <!-- Historial de búsquedas -->
+    <section class="historial-seccion" id="historial-seccion">
+      <div class="fila-historial">
+        <h2 class="titulo-seccion">Búsquedas recientes</h2>
+        <button id="btn-limpiar-historial" class="btn-texto">Limpiar todo</button>
+      </div>
+      <ul class="lista-historial" id="lista-historial"></ul>
     </section>
 
-    <!-- Indicador de carga -->
+    <!-- Buscador principal (estilo ventana retro) -->
+    <section class="search-section">
+      <div class="buscador-ventana">
+        <div class="ventana-titulo">
+          <span class="ventana-icono">🔍</span>
+          <span class="ventana-texto">BUSCAR USUARIO</span>
+          <div class="ventana-controles">
+            <span class="btn-ventana min"></span>
+            <span class="btn-ventana max"></span>
+            <span class="btn-ventana close"></span>
+          </div>
+        </div>
+        <div class="ventana-contenido">
+          <form id="form-buscar" novalidate>
+            <div class="grupo-buscar">
+              <label for="usuario" class="visually-hidden">Nombre de usuario de GitHub</label>
+              <input
+                type="text"
+                id="usuario"
+                name="usuario"
+                placeholder="Ejemplo: torvalds"
+                autocomplete="off"
+                maxlength="39"
+                spellcheck="false"
+              />
+              <button type="submit" id="btn-buscar" class="btn-buscar">
+                <span class="texto-btn">Buscar</span>
+                <span class="cargador-btn" aria-hidden="true"></span>
+              </button>
+            </div>
+            <p id="alerta-validacion" class="alerta error" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estado de carga -->
     <div id="cargando" class="cargando" role="status" aria-live="polite">
-      <div class="spinner"></div>
-      <span>Buscando información en GitHub...</span>
+      <div class="barra-progreso"></div>
+      <span>Consultando GitHub</span>
     </div>
 
-    <!-- Mensaje de error de la API -->
-    <div id="mensaje-error" class="mensaje error oculto" role="alert" aria-live="assertive"></div>
+    <!-- Estado de error -->
+    <div id="mensaje-error" class="mensaje error oculto" role="alert" aria-live="assertive">
+      <div class="error-ventana">
+        <div class="ventana-titulo">
+          <span class="ventana-icono">⚠️</span>
+          <span class="ventana-texto">ERROR</span>
+          <div class="ventana-controles">
+            <span class="btn-ventana close"></span>
+          </div>
+        </div>
+        <div class="ventana-contenido">
+          <strong id="titulo-error">Error</strong>
+          <p id="texto-error" class="texto-error"></p>
+          <button id="btn-reintentar" class="btn-secundario">Intentar de nuevo</button>
+        </div>
+      </div>
+    </div>
 
-    <!-- Tarjeta de perfil (se inyecta desde JavaScript) -->
+    <!-- Tarjeta de perfil -->
     <section id="perfil" class="perfil-seccion oculto">
       <article class="tarjeta-perfil" aria-label="Perfil de GitHub">
 
-        <!-- Columna lateral izquierda: avatar + estadísticas -->
-        <div class="tarjeta-lateral">
-          <div class="avatar-container">
-            <img id="img-avatar" class="avatar" alt="" />
-          </div>
-
-          <div class="estadisticas-lateral">
-            <div class="stat-lateral">
-              <span class="valor" id="stat-repos">0</span>
-              <span class="etiqueta">Repos públicos</span>
-            </div>
-            <div class="stat-lateral">
-              <span class="valor" id="stat-seguidores">0</span>
-              <span class="etiqueta">Seguidores</span>
-            </div>
-            <div class="stat-lateral">
-              <span class="valor" id="stat-siguiendo">0</span>
-              <span class="etiqueta">Siguiendo</span>
-            </div>
-            <div class="stat-lateral">
-              <span class="valor" id="stat-gists">0</span>
-              <span class="etiqueta">Gists públicos</span>
-            </div>
+        <div class="ventana-titulo-perfil">
+          <span class="ventana-icono">👤</span>
+          <span class="ventana-texto">PERFIL DE GITHUB</span>
+          <div class="ventana-controles-perfil">
+            <span class="btn-ventana min"></span>
+            <span class="btn-ventana max"></span>
+            <span class="btn-ventana close"></span>
           </div>
         </div>
 
-        <!-- Columna derecha: nombre, biografía, enlace y repositorios -->
-        <div class="tarjeta-contenido">
-          <div class="datos-principales">
-            <h2 id="nombre-usuario" class="nombre"></h2>
-            <p id="bio" class="bio"></p>
-            <a id="enlace-perfil" class="enlace-perfil" target="_blank" rel="noopener noreferrer">
-              Ver perfil en GitHub →
-            </a>
-          </div>
+        <div class="ventana-contenido-perfil">
+          <div class="perfil-cuerpo">
 
-          <!-- Repositorios -->
-          <div class="repos-seccion">
-            <h3 class="titulo-repos">Repositorios públicos</h3>
-            <ul id="lista-repos" class="lista-repos"></ul>
+            <!-- Lateral: avatar y estadísticas -->
+            <div class="perfil-lateral">
+              <div class="avatar-contenedor">
+                <img id="img-avatar" class="avatar" alt="" />
+                <div class="insignia-verificada" id="insignia-verificada" title="Cuenta verificada">✓</div>
+                <div class="acciones-avatar">
+                  <button id="btn-favorito" class="btn-favorito" aria-label="Agregar a favoritos" title="Agregar a favoritos">☆</button>
+                </div>
+              </div>
+
+              <div class="estadisticas-lateral">
+                <div class="stat-lateral">
+                  <span class="valor" id="stat-repos">0</span>
+                  <span class="etiqueta">Repos públicos</span>
+                </div>
+                <div class="stat-lateral">
+                  <span class="valor" id="stat-seguidores">0</span>
+                  <span class="etiqueta">Seguidores</span>
+                </div>
+                <div class="stat-lateral">
+                  <span class="valor" id="stat-siguiendo">0</span>
+                  <span class="etiqueta">Siguiendo</span>
+                </div>
+                <div class="stat-lateral">
+                  <span class="valor" id="stat-gists">0</span>
+                  <span class="etiqueta">Gists públicos</span>
+                </div>
+              </div>
+
+              <div class="datos-extra">
+                <div class="dato-extra">
+                  <span class="icono-dato">📅</span>
+                  <span>Creado: <span id="dato-creado">—</span></span>
+                </div>
+                <div class="dato-extra">
+                  <span class="icono-dato">📍</span>
+                  <span id="dato-ubicacion" class="dato-ubicacion">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Derecho: datos principales, biografía, enlaces, repositorios -->
+            <div class="perfil-derecho">
+              <div class="datos-principales">
+                <div class="fila-nombre">
+                  <h2 id="nombre-usuario" class="nombre"></h2>
+                  <span id="nickname" class="nickname">@usuario</span>
+                </div>
+                <p id="bio" class="bio"></p>
+
+                <div class="contacto">
+                  <a id="enlace-blog" class="chip-contacto" target="_blank" rel="noopener noreferrer" aria-label="Sitio web">
+                    <span class="icono-chip">🌐</span><span id="texto-blog"></span>
+                  </a>
+                  <a id="enlace-twitter" class="chip-contacto" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X">
+                    <span class="icono-chip">🐦</span><span id="texto-twitter"></span>
+                  </a>
+                  <a id="enlace-empresa" class="chip-contacto" target="_blank" rel="noopener noreferrer" aria-label="Empresa">
+                    <span class="icono-chip">🏢</span><span id="texto-empresa"></span>
+                  </a>
+                  <a id="enlace-perfil" class="btn-perfil" target="_blank" rel="noopener noreferrer">
+                    Ver perfil en GitHub →
+                  </a>
+                </div>
+              </div>
+
+              <!-- README del perfil (antes que los repositorios) -->
+              <section id="readme-seccion" class="readme-seccion oculto" aria-label="README del perfil">
+                <div class="readme-header">
+                  <h3 class="titulo-readme">📄 README del perfil</h3>
+                  <button id="btn-copiar-readme" class="btn-texto" title="Copiar contenido">Copiar</button>
+                </div>
+                <div id="readme-contenido" class="markdown-body"></div>
+              </section>
+
+              <!-- Repositorios -->
+              <div class="repos-seccion">
+                <div class="cabecera-repos">
+                  <h3 class="titulo-repos">Repositorios públicos</h3>
+                  <span id="contador-repos" class="contador-repos">0</span>
+                </div>
+                <ul id="lista-repos" class="lista-repos"></ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </article>
     </section>
 
-    <!-- README del perfil (se inyecta desde JavaScript, solo si existe) -->
-    <section id="readme-seccion" class="readme-seccion oculto" aria-label="README del perfil">
-      <h3 class="titulo-readme">README del perfil</h3>
-      <div id="readme-contenido" class="markdown-body"></div>
-    </section>
-
   </main>
 
   <footer class="site-footer">
-    <p>Aplicación educativa que consume la API pública de GitHub. Sin tokens ni datos inventados.</p>
+    <div class="footer-contenido">
+      <p>🔍 Consume la API pública de GitHub sin tokens. Datos reales, sin inventar.</p>
+      <p class="footer-nota">Estilo retro 90s · Código abierto</p>
+    </div>
   </footer>
 
   <script src="script.js"></script>
